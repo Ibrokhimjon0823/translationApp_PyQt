@@ -1,16 +1,26 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QComboBox, QTextEdit, QMessageBox
+from PyQt6 import uic
+import sys
+import googletrans
+import textblob
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+class UI(QMainWindow):
+    def __init__(self):
+        super(UI, self).__init__()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+        # Load the ui file
+        uic.loadUi("translate.ui", self)
+        self.setWindowTitle("Translator App")
+
+        # Define our widgets
+
+        # Show The App
+        self.show()
+
+
+# Initialize The App
+app = QApplication(sys.argv)
+UIWindow = UI()
+app.exec()
+
