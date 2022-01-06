@@ -54,16 +54,17 @@ class UI(QMainWindow):
         self.textEdit_2.setText("")
 
         # Reset the combo boxes
-
+        self.combo_1.setCurrentText("english")
+        self.combo_2.setCurrentText("uzbek")
     def translate(self):
         try:
             # Get original language key
             for key, value in self.languages.items():
-                if(value == self.combo_1.currentText()):
+                if value == self.combo_2.currentText():
                     from_language_key = key
             # Get translated language key
             for key, value in self.languages.items():
-                if(value == self.combo_2.currentText()):
+                if value == self.combo_1.currentText():
                     to_language_key = key
 
             self.text_1.setText(from_language_key)
