@@ -1,88 +1,50 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QComboBox, QTextEdit, QMessageBox
-from PyQt5 import uic
-import sys
-import googletrans
-import textblob
+from PySide2 import QtCore, QtGui, QtWidgets
+from mainui import Ui_MainWindow
 
+from dialogui import Ui_Dialog
 
-class UI(QMainWindow):
+class OptionsDialog(QtWidgets.QDialog,Ui_Dialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setupUi(self)
+
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.LanguageChange:
+            self.retranslateUi(self)
+        super(OptionsDialog, self).changeEvent(event)
+
+class MainWindow(QtWidgets.QMainWindow,Ui_MainWindow):
     def __init__(self):
-        super(UI, self).__init__()
+        super().__init__()
+        self.setupUi(self)
+        self.translator = QtCore.QTranslator(self)
+        self.actionConfigure.triggered.connect(self.showdialog)
+        self.menuLanguage.triggered.connect(self.change_lang)
+        # set translation for each submenu
+        self.actionChinese.setData('zh_CN.qm')
+        self.actionRussian.setData('zh_RU.qm')
+        self.actionUzbek.setData('zh_UZ.qm')
 
-        # Load the ui file
-        uic.loadUi("translate.ui", self)
-        self.setWindowTitle("Translator App")
+    @QtCore.Slot()
+    def showdialog(self):
+        dlg = OptionsDialog(self)
+        dlg.exec_()
 
-        # Define our widgets
-        self.t_button = self.findChild(QPushButton, "pushButton")
-        self.c_button = self.findChild(QPushButton, "pushButton_2")
+    @QtCore.Slot(QtWidgets.QAction)
+    def change_lang(self, action):
+        QtCore.QCoreApplication.instance().removeTranslator(self.translator)
+        if self.translator.load(action.data()):
+            QtCore.QCoreApplication.instance().installTranslator(self.translator)
 
-        self.combo_1 = self.findChild(QComboBox, "comboBox")
-        self.combo_2 = self.findChild(QComboBox, "comboBox_2")
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.LanguageChange:
+            self.retranslateUi(self)
+        super(MainWindow, self).changeEvent(event)
 
-        self.text_1 = self.findChild(QTextEdit, "textEdit")
-        self.text_2 = self.findChild(QTextEdit, "textEdit_2")
-
-        # Click the buttons
-        self.t_button.clicked.connect(self.translate)
-        self.c_button.clicked.connect(self.clear)
-
-        # Add languages to the combo boxes
-        self.languages = googletrans.LANGUAGES
-        # print(self.languages)
-
-        # Convert to list
-        self.language_list = list(self.languages.values())
-        # print(self.language_list)
-
-        # Add items to combo boxes
-        self.combo_1.addItems(self.language_list)
-        self.combo_2.addItems(self.language_list)
-
-        # set default combo box
-        self.combo_1.setCurrentText("english")
-        self.combo_2.setCurrentText("uzbek")
-
-        # Show The App
-        self.show()
-
-    def clear(self):
-        # Clear the text boxes
-        self.textEdit.setText("")
-        self.textEdit_2.setText("")
-
-        # Reset the combo boxes
-        self.combo_1.setCurrentText("english")
-        self.combo_2.setCurrentText("uzbek")
-
-    def translate(self):
-        try:
-            # Get original language key
-            for key, value in self.languages.items():
-                if value == self.combo_2.currentText():
-                    from_language_key = key
-            # Get translated language key
-            for key, value in self.languages.items():
-                if value == self.combo_1.currentText():
-                    to_language_key = key
-
-            # self.text_1.setText(from_language_key)
-            # self.text_2.setText(to_language_key)
-
-            # Turn original text into a textblob
-            words = textblob.TextBlob(self.text_1.toPlainText())
-
-            # Translate words
-            words = words.translate(from_lang=from_language_key, to=to_language_key)
-
-            # Output to text_2
-            self.text_2.setText(str(words))
-
-        except Exception as e:
-            QMessageBox.about(self, 'Translator', str(e))
-
-    
-# Initialize The App
-app = QApplication(sys.argv)
-UIWindow = UI()
-app.exec()
+if __name__=='__main__':
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    mainWin = MainWindow()
+    mainWin.show()
+    ret = app.exec_()
+    sys.exit(ret)
