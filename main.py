@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QComboBox, QTextEdit, QMessageBox
-from PyQt6 import uic
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QComboBox, QTextEdit, QMessageBox
+from PyQt5 import uic
 import sys
 import googletrans
 import textblob
@@ -43,10 +43,8 @@ class UI(QMainWindow):
         self.combo_1.setCurrentText("english")
         self.combo_2.setCurrentText("uzbek")
 
-
         # Show The App
         self.show()
-
 
     def clear(self):
         # Clear the text boxes
@@ -56,6 +54,7 @@ class UI(QMainWindow):
         # Reset the combo boxes
         self.combo_1.setCurrentText("english")
         self.combo_2.setCurrentText("uzbek")
+
     def translate(self):
         try:
             # Get original language key
@@ -67,14 +66,23 @@ class UI(QMainWindow):
                 if value == self.combo_1.currentText():
                     to_language_key = key
 
-            self.text_1.setText(from_language_key)
-            self.text_2.setText(to_language_key)
+            # self.text_1.setText(from_language_key)
+            # self.text_2.setText(to_language_key)
+
+            # Turn original text into a textblob
+            words = textblob.TextBlob(self.text_1.toPlainText())
+
+            # Translate words
+            words = words.translate(from_lang=from_language_key, to=to_language_key)
+
+            # Output to text_2
+            self.text_2.setText(str(words))
 
         except Exception as e:
             QMessageBox.about(self, 'Translator', str(e))
 
+    
 # Initialize The App
 app = QApplication(sys.argv)
 UIWindow = UI()
 app.exec()
-
